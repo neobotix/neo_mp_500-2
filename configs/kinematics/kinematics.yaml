@@ -1,0 +1,6 @@
+#robot's geometric parameters:
+neo_differential_node:
+  ros__parameters:
+    wheelDiameter: 0.2675
+    robotLength: 0.676
+    robotWidth: 0.507
