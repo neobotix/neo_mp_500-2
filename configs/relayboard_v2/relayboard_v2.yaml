@@ -3,6 +3,8 @@ neo_relayboard_node:
     port: /dev/ttyUSB0
     request_rate: 50.0
     motor_delay: 0.015
+    number_of_drives: 2
+    Publish_joint_states: false
 
     #################################################
     #                 battery                       #
@@ -19,7 +21,7 @@ neo_relayboard_node:
     battery:
       serial_number: neobattery1
       location: slot1
-      design_capacity: 100
+      design_capacity: 100.0
       chemistry: 1
 
 
@@ -67,7 +69,7 @@ neo_relayboard_node:
       homing_active: false
       EncIncrPerRevMot: 10000
       VelMeasFrqHz: 1.0
-      GearRatio: 8.0
+      GearRatio: 12.0
       BeltRatio: 1.0
       Sign: 1
       VelMaxEncIncrS: 300000.0
@@ -82,7 +84,7 @@ neo_relayboard_node:
       homing_active: false
       EncIncrPerRevMot: 10000
       VelMeasFrqHz: 1.0
-      GearRatio: 8.0
+      GearRatio: 12.0
       BeltRatio: 1.0
       Sign: 1
       VelMaxEncIncrS: 300000.0
