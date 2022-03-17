@@ -22,13 +22,13 @@
     <visual name="body">
       <origin rpy="0 0 1.570796" xyz="0.0 0.0 0"/>
       <geometry>
-        <mesh filename="package://neo_mp_500/robot_model/mp_500/meshes/MP-500-BODY.dae" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://neo_mp_500-2/robot_model/mp_500/meshes/MP-500-BODY.dae" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision name="body_collision">
       <origin rpy=" 0 0. 1.570796" xyz="0.0 0.0 0.0"/>
       <geometry>
-        <mesh filename="package://neo_mp_500/robot_model/mp_500/meshes/MP-500-BODY.dae" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://neo_mp_500-2/robot_model/mp_500/meshes/MP-500-BODY.dae" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -58,7 +58,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="wheel_right_joint" type="revolute">
+  <joint name="wheel_right_joint" type="fixed">
     <origin rpy="0 0 -1.570796" xyz="0. -0.25 0.13"/>
     <limit effort="1000.0" lower="-1e+16" upper="1e+16" velocity="3.5"/>
     <axis xyz="-1 0 0"/>
@@ -75,7 +75,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://neo_mp_500/robot_model/mp_500/meshes/MP-500-WHEEL-RIGHT.dae" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://neo_mp_500-2/robot_model/mp_500/meshes/MP-500-WHEEL-RIGHT.dae" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
@@ -85,7 +85,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="wheel_left_joint" type="revolute">
+  <joint name="wheel_left_joint" type="fixed">
     <origin rpy="0 0 -1.570796" xyz="0. 0.25 0.13"/>
     <limit effort="1000.0" lower="-1e+16" upper="1e+16" velocity="3.5"/>
     <axis xyz="-1 0 0"/>
