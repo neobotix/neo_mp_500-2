@@ -59,6 +59,9 @@ public:
       std::bind(&ConfigureRelays::odomCallback, this, _1));
 
     set_relays_client_ =
+      client_node_->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay");
+
+    set_relays2_client_ =
       this->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay");
 
     this->timer_ = this->create_wall_timer(
@@ -78,7 +81,7 @@ private:
     std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay2,
     std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay3)
   {
-    auto relay2_result = set_relays_client_->async_send_request(relay2);
+    auto relay2_result = set_relays2_client_->async_send_request(relay2);
     auto relay3_result = set_relays_client_->async_send_request(relay3);
   }
 
@@ -89,10 +92,10 @@ private:
     if (odom_vel_.linear.x <= slow_speed_) {
       relay2->state = false;
       relay3->state = false;
-    } else if (odom_vel_.linear.x >= slow_speed_ && odom_vel_.linear.x < medium_speed_) {
+    } else if (odom_vel_.linear.x > slow_speed_ && odom_vel_.linear.x <= medium_speed_) {
       relay2->state = false;
       relay3->state = true;
-    } else if (odom_vel_.linear.x >= medium_speed_ && odom_vel_.linear.x < faster_speed_) {
+    } else if (odom_vel_.linear.x > medium_speed_ && odom_vel_.linear.x <= faster_speed_) {
       relay2->state = true;
       relay3->state = false;
     } else if (odom_vel_.linear.x > faster_speed_) {
@@ -110,6 +113,7 @@ private:
 
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Client<neo_srvs2::srv::RelayBoardSetRelay>::SharedPtr set_relays_client_;
+  rclcpp::Client<neo_srvs2::srv::RelayBoardSetRelay>::SharedPtr set_relays2_client_;
   rclcpp::TimerBase::SharedPtr timer_;
 
   geometry_msgs::msg::Twist odom_vel_;
