@@ -73,6 +73,15 @@ public:
   }
 
 private:
+  // send request
+  void send_request(
+    std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay2,
+    std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay3)
+  {
+    auto relay2_result = set_relays_client_->async_send_request(relay2);
+    auto relay3_result = set_relays_client_->async_send_request(relay3);
+  }
+
   // Thread where relays are set
   void helper_thread()
   {
@@ -90,34 +99,7 @@ private:
       relay2->state = true;
       relay3->state = true;
     }
-
-    while (!set_relays_client_->wait_for_service(1s)) {
-      if (!rclcpp::ok()) {
-        RCLCPP_ERROR(
-          client_node_->get_logger(),
-          "Interrupted while waiting for the service. Exiting.");
-        return;
-      }
-      RCLCPP_INFO(client_node_->get_logger(), "service not available, waiting again...");
-    }
-
-    auto relay2_result = set_relays_client_->async_send_request(relay2);
-    if (rclcpp::spin_until_future_complete(client_node_, relay2_result) ==
-      rclcpp::FutureReturnCode::SUCCESS)
-    {
-      RCLCPP_INFO(client_node_->get_logger(), "Relays set to: ");
-    } else {
-      RCLCPP_ERROR(client_node_->get_logger(), "Failed to call service set_relay");
-    }
-
-    auto relay3_result = set_relays_client_->async_send_request(relay3);
-    if (rclcpp::spin_until_future_complete(client_node_, relay3_result) ==
-      rclcpp::FutureReturnCode::SUCCESS)
-    {
-      RCLCPP_INFO(client_node_->get_logger(), "Relays set to: ");
-    } else {
-      RCLCPP_ERROR(client_node_->get_logger(), "Failed to call service set_relay");
-    }
+    send_request(relay2, relay3);
   }
 
   // Odom callback
