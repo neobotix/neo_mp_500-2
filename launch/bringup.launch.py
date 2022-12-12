@@ -27,6 +27,12 @@ def generate_launch_description():
         output='screen',
         parameters=[rsp_params])
 
+    # Todo add parameters
+    switch_relay = Node(
+        package='neo_mp_500-2',
+        executable='configure_relays',
+        output='screen')
+
     relayboard = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(neo_mp_500, 'configs/relayboard_v2', 'relayboard_v2.launch.py')
@@ -51,4 +57,4 @@ def generate_launch_description():
         )
 
 
-    return LaunchDescription([relayboard, start_robot_state_publisher_cmd, laser, kinematics, teleop])
+    return LaunchDescription([relayboard, start_robot_state_publisher_cmd, laser, kinematics, teleop, switch_relay])
