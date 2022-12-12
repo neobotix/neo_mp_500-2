@@ -59,7 +59,7 @@ public:
       std::bind(&ConfigureRelays::odomCallback, this, _1));
 
     set_relays_client_ =
-      client_node_->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay");
+      client_node_->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay3");
 
     set_relays2_client_ =
       this->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay");
