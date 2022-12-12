@@ -64,6 +64,10 @@ public:
     set_relays2_client_ =
       this->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay");
 
+    this->timer_ = this->create_wall_timer(
+      std::chrono::milliseconds(10),
+      std::bind(&ConfigureRelays::helper_thread, this));
+
     relay2 = std::make_shared<neo_srvs2::srv::RelayBoardSetRelay::Request>();
     relay2->id = 2;
 
@@ -72,12 +76,19 @@ public:
   }
 
 private:
-  // send request
-  void send_request(
-    std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay2,
-    std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay3)
+  // Thread where relays are set
+  void helper_thread()
   {
-    auto relay2_result = set_relays2_client_->async_send_request(relay2);
+    // 4 possible cases
+    if (odom_vel_.linear.x <= slow_speed_) {
+      relay3->state = false;
+    } else if (odom_vel_.linear.x > slow_speed_ && odom_vel_.linear.x <= medium_speed_) {
+      relay3->state = true;
+    } else if (odom_vel_.linear.x > medium_speed_ && odom_vel_.linear.x <= faster_speed_) {
+      relay3->state = false;
+    } else if (odom_vel_.linear.x > faster_speed_) {
+      relay3->state = true;
+    }
     auto relay3_result = set_relays_client_->async_send_request(relay3);
   }
 
@@ -88,23 +99,20 @@ private:
     // 4 possible cases
     if (odom_vel_.linear.x <= slow_speed_) {
       relay2->state = false;
-      relay3->state = false;
     } else if (odom_vel_.linear.x > slow_speed_ && odom_vel_.linear.x <= medium_speed_) {
       relay2->state = false;
-      relay3->state = true;
     } else if (odom_vel_.linear.x > medium_speed_ && odom_vel_.linear.x <= faster_speed_) {
       relay2->state = true;
-      relay3->state = false;
     } else if (odom_vel_.linear.x > faster_speed_) {
       relay2->state = true;
-      relay3->state = true;
     }
-    send_request(relay2, relay3);
+    auto relay2_result = set_relays2_client_->async_send_request(relay2);
   }
 
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Client<neo_srvs2::srv::RelayBoardSetRelay>::SharedPtr set_relays_client_;
   rclcpp::Client<neo_srvs2::srv::RelayBoardSetRelay>::SharedPtr set_relays2_client_;
+  rclcpp::TimerBase::SharedPtr timer_;
 
   geometry_msgs::msg::Twist odom_vel_;
 
