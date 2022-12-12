@@ -10,6 +10,9 @@
   <author email="padmanabhan@neobotix.de">Pradheep Padmanabhan</author> 
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>neo_srvs2</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
