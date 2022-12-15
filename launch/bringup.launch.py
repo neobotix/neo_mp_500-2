@@ -14,6 +14,8 @@ def generate_launch_description():
     neo_mp_500 = get_package_share_directory('neo_mp_500-2')
 
     urdf = os.path.join(get_package_share_directory('neo_mp_500-2'), 'robot_model/mp_500', 'mp_500.urdf')
+    config_relays = os.path.join(get_package_share_directory('neo_mp_500-2'),'configs/relayboard_v2', 'config_relays.yaml')
+
 
     with open(urdf, 'r') as infp:  
         robot_desc = infp.read() # Dummy to use parameter instead of using argument=[urdf] in Node. Reference page: https://github.com/ros2/demos/pull/426/commits/a35a25732159e4c8b5655755ce31ec4c3e6e7975
@@ -31,7 +33,8 @@ def generate_launch_description():
     switch_relay = Node(
         package='neo_mp_500-2',
         executable='configure_relays',
-        output='screen')
+        output='screen',
+        parameters=[config_relays])
 
     relayboard = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(

@@ -1,0 +1,5 @@
+configure_relays:
+  ros__parameters:
+    slow_speed : 1.0
+    medium_speed : 2.0
+    faster_speed : 3.0
