@@ -301,7 +301,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_link
       footprint_padding: 0.0
-      footprint:  "[ [0.50,0.50],[-0.50,0.50],[-0.50,-0.50],[0.50,-0.50] ]"
+      footprint:  "[ [0.30,0.50],[-0.50,0.50],[-0.50,-0.50],[0.30,-0.50] ]"
       use_sim_time: False
       resolution: 0.05
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
@@ -310,7 +310,7 @@ global_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /scan
+          topic: /lidar_1/scan_filtered
           obstacle_max_range: 5.0
           max_obstacle_height: 2.0
           obstacle_min_range: 0.0
