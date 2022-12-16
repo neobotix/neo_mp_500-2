@@ -41,13 +41,15 @@ public:
   {
     // declare parameters
     this->declare_parameter<double>("slow_speed", 1.0);
-    this->declare_parameter<double>("medium_speed", 2.0);
-    this->declare_parameter<double>("faster_speed", 2.7);
+    this->declare_parameter<double>("medium_speed", 1.3);
+    this->declare_parameter<double>("faster_speed", 1.8);
+    this->declare_parameter<double>("scan_switch_delay", 0.2);
 
     // get parameters
     this->get_parameter("slow_speed", slow_speed_);
     this->get_parameter("medium_speed", medium_speed_);
     this->get_parameter("faster_speed", faster_speed_);
+    this->get_parameter("scan_switch_delay", scan_switch_delay_);
 
     // seperate client node for spin safety
     client_node_ = std::make_shared<rclcpp::Node>("set_relays_client");
@@ -58,6 +60,8 @@ public:
       "odom", 1,
       std::bind(&ConfigureRelays::odomCallback, this, _1));
 
+    timer_cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
     set_relays_client_ =
       client_node_->create_client<neo_srvs2::srv::RelayBoardSetRelay>("set_relay3");
 
@@ -66,7 +70,8 @@ public:
 
     this->timer_ = this->create_wall_timer(
       std::chrono::milliseconds(10),
-      std::bind(&ConfigureRelays::helper_thread, this));
+      std::bind(&ConfigureRelays::helper_thread, this),
+      timer_cb_group_);
 
     relay2 = std::make_shared<neo_srvs2::srv::RelayBoardSetRelay::Request>();
     relay2->id = 2;
@@ -76,45 +81,117 @@ public:
   }
 
 private:
+  inline double convert_to_double(builtin_interfaces::msg::Time stamp)
+  {
+    return stamp.sec + stamp.nanosec / 1e9;
+  }
   // Thread where relays are set
   void helper_thread()
   {
     // 4 possible cases
-    if (odom_vel_.linear.x <= slow_speed_) {
+    if (odom_.twist.twist.linear.x <= slow_speed_) {
       relay3->state = false;
-    } else if (odom_vel_.linear.x > slow_speed_ && odom_vel_.linear.x <= medium_speed_) {
+    } else if (odom_.twist.twist.linear.x > slow_speed_ &&
+      odom_.twist.twist.linear.x <= medium_speed_)
+    {
       relay3->state = true;
-    } else if (odom_vel_.linear.x > medium_speed_ && odom_vel_.linear.x <= faster_speed_) {
+    } else if (odom_.twist.twist.linear.x > medium_speed_ &&
+      odom_.twist.twist.linear.x <= faster_speed_)
+    {
       relay3->state = false;
-    } else if (odom_vel_.linear.x > faster_speed_) {
+    } else if (odom_.twist.twist.linear.x > faster_speed_) {
       relay3->state = true;
     }
-    auto relay3_result = set_relays_client_->async_send_request(relay3);
+
+    if (slow_down_) {
+      if (temp_relay3_state != relay3->state &&
+        !time_stored_relay_3_)
+      {
+        temp_odom_relay_3_ = odom_;
+        time_stored_relay_3_ = true;
+      }
+
+      if (!time_stored_relay_3_) {
+        temp_odom_relay_3_ = odom_;
+      }
+
+      if (convert_to_double(odom_.header.stamp) -
+        convert_to_double(temp_odom_relay_3_.header.stamp) >= scan_switch_delay_)
+      {
+        auto relay3_result = set_relays_client_->async_send_request(relay3);
+        temp_odom_relay_3_ = odom_;
+        time_stored_relay_3_ = false;
+      }
+    } else {
+      if (!time_stored_relay_3_) {
+        auto relay3_result = set_relays_client_->async_send_request(relay3);
+      }
+    }
+    temp_relay3_state = relay3->state;
+    last_odom_ = odom_;
   }
 
   // Odom callback
   void odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom)
   {
-    odom_vel_ = odom->twist.twist;
+    odom_ = *odom;
+
     // 4 possible cases
-    if (odom_vel_.linear.x <= slow_speed_) {
+    if (odom_.twist.twist.linear.x <= slow_speed_) {
       relay2->state = false;
-    } else if (odom_vel_.linear.x > slow_speed_ && odom_vel_.linear.x <= medium_speed_) {
+    } else if (odom_.twist.twist.linear.x > slow_speed_ &&
+      odom_.twist.twist.linear.x <= medium_speed_)
+    {
       relay2->state = false;
-    } else if (odom_vel_.linear.x > medium_speed_ && odom_vel_.linear.x <= faster_speed_) {
+    } else if (odom_.twist.twist.linear.x > medium_speed_ &&
+      odom_.twist.twist.linear.x <= faster_speed_)
+    {
       relay2->state = true;
-    } else if (odom_vel_.linear.x > faster_speed_) {
+    } else if (odom_.twist.twist.linear.x > faster_speed_) {
       relay2->state = true;
     }
-    auto relay2_result = set_relays2_client_->async_send_request(relay2);
+
+    if (last_odom_.twist.twist.linear.x > odom_.twist.twist.linear.x) {
+      slow_down_ = true;
+      if (temp_relay2_state != relay2->state && !time_stored_relay_2_) {
+        temp_odom_relay_2_ = odom_;
+        time_stored_relay_2_ = true;
+      }
+    } else {
+      slow_down_ = false;
+    }
+
+    if (!time_stored_relay_2_) {
+      temp_odom_relay_2_ = odom_;
+    }
+
+    if (slow_down_) {
+      if (convert_to_double(odom_.header.stamp) -
+        convert_to_double(temp_odom_relay_2_.header.stamp) >= scan_switch_delay_)
+      {
+        auto relay2_result = set_relays2_client_->async_send_request(relay2);
+        temp_odom_relay_2_ = odom_;
+        time_stored_relay_2_ = false;
+        return;
+      }
+    } else {
+      if (!time_stored_relay_2_) {
+        auto relay2_result = set_relays2_client_->async_send_request(relay2);
+      }
+    }
+    temp_relay2_state = relay2->state;
   }
 
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Client<neo_srvs2::srv::RelayBoardSetRelay>::SharedPtr set_relays_client_;
   rclcpp::Client<neo_srvs2::srv::RelayBoardSetRelay>::SharedPtr set_relays2_client_;
   rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::CallbackGroup::SharedPtr timer_cb_group_;
 
-  geometry_msgs::msg::Twist odom_vel_;
+  nav_msgs::msg::Odometry odom_;
+  nav_msgs::msg::Odometry last_odom_;
+  nav_msgs::msg::Odometry temp_odom_relay_2_;
+  nav_msgs::msg::Odometry temp_odom_relay_3_;
 
   std::shared_ptr<rclcpp::Node> client_node_;
   std::shared_ptr<neo_srvs2::srv::RelayBoardSetRelay::Request> relay2;
@@ -123,18 +200,28 @@ private:
   double slow_speed_;
   double medium_speed_;
   double faster_speed_;
+  double scan_switch_delay_;
+
+  bool slow_down_ = false;
+  bool time_stored_relay_2_ = false;
+  bool time_stored_relay_3_ = false;
+
+  bool temp_relay2_state = false;
+  bool temp_relay3_state = false;
 };
 
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<ConfigureRelays>();
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(node);
 
-  // setting loop rate to 100 hz
-  rclcpp::Rate loop_rate(100);
+  // setting loop rate to 50 hz
+  rclcpp::Rate loop_rate(50);
 
   while (rclcpp::ok()) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
     loop_rate.sleep();
   }
 

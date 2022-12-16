@@ -3,3 +3,4 @@ configure_relays:
     slow_speed : 1.0
     medium_speed : 2.0
     faster_speed : 3.0
+    scan_switch_delay: 0.5
