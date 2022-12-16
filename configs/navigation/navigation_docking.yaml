@@ -191,7 +191,7 @@ controller_server:
       movement_time_allowance: 100.0
     general_goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.05
+      xy_goal_tolerance: 0.1
       yaw_goal_tolerance: 0.05
       stateful: True
     FollowPath:
@@ -301,7 +301,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_link
       footprint_padding: 0.0
-      footprint:  "[ [0.30,0.50],[-0.50,0.50],[-0.50,-0.50],[0.30,-0.50] ]"
+      footprint:  "[ [0.50,0.50],[-0.50,0.50],[-0.50,-0.50],[0.50,-0.50] ]"
       use_sim_time: False
       resolution: 0.05
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]

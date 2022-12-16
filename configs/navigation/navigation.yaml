@@ -193,17 +193,17 @@ controller_server:
       movement_time_allowance: 100.0
     general_goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.05
-      yaw_goal_tolerance: 0.05
+      xy_goal_tolerance: 0.1
+      yaw_goal_tolerance: 0.1
       stateful: True
     FollowPath:
       plugin: "neo_local_planner::NeoLocalPlanner"
       # The x acceleration limit of the robot in meters/sec^2
-      acc_lim_x : 0.2
+      acc_lim_x : 1.2
       # The rotational acceleration limit of the robot in radians/sec^2
       acc_lim_theta : 0.6
       # The maximum x velocity for the robot in m/s.
-      max_vel_x : 0.8
+      max_vel_x : 2.4
       # The minimum x velocity for the robot in m/s, negative for backwards motion.
       min_vel_x : -0.1
       # The absolute value of the maximum rotational velocity for the robot in rad/s
@@ -211,7 +211,7 @@ controller_server:
       # The absolute value of the minimum rotational velocity for the robot in rad/s
       min_rot_vel : 0.1
       # The absolute value of the maximum translational velocity for the robot in m/s
-      max_trans_vel : 0.8
+      max_trans_vel : 2.4
       # The absolute value of the minimum translational velocity for the robot in m/s
       min_trans_vel : 0.1
       # The tolerance in radians for the controller in yaw/rotation when achieving its goal
@@ -312,7 +312,7 @@ global_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /scan
+          topic: /lidar_1/scan_filtered
           obstacle_max_range: 5.0
           max_obstacle_height: 2.0
           obstacle_min_range: 0.0

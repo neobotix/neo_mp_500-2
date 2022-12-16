@@ -23,6 +23,7 @@ ament_target_dependencies(configure_relays
   neo_srvs2
   geometry_msgs
   nav_msgs
+  builtin_interfaces
   )
 
 target_compile_features(configure_relays PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
