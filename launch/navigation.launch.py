@@ -24,7 +24,7 @@ def execution_stage(
         autostart, namespace, use_multi_robots,
         head_robot, use_amcl, map_dir, param_dir, use_rviz):
     
-    launches = []
+    launch_actions = []
 
     params = str(param_dir.perform(context))
 
@@ -92,15 +92,15 @@ def execution_stage(
             name='lifecycle_manager_localization',
             output='screen',
             parameters=[{'use_sim_time': use_sim_time},
-						{'autostart': autostart},
+                        {'autostart': autostart},
                         {'node_names': ['map_server']}])
         ]
     )
 
-    launches.append(start_navigation)
-    launches.append(start_map_server)
+    launch_actions.append(start_navigation)
+    launch_actions.append(start_map_server)
 
-    return launches
+    return launch_actions
 
 def generate_launch_description():
     launch_desc = LaunchDescription()
@@ -118,32 +118,32 @@ def generate_launch_description():
             'use_sim_time', default_value='false',
             description='Use simulation clock if true'
         )
-    
+
     declare_autostart_cmd = DeclareLaunchArgument(
             'autostart', default_value='true',
             description='Automatically start the nav2 stack'
         )
-    
+
     declare_namespace_cmd = DeclareLaunchArgument(
             'robot_namespace', default_value='',
             description='Top-level namespace'
         )
-    
+
     declare_use_multi_robots_cmd = DeclareLaunchArgument(
             'use_multi_robots', default_value='False',
             description='Use multi robots'
         )
-    
+
     declare_head_robot_cmd = DeclareLaunchArgument(
             'head_robot', default_value='False',
             description='Head robot'
         )
-    
+
     declare_use_amcl_cmd = DeclareLaunchArgument(
             'use_amcl', default_value='False',
             description='Use AMCL'
         )
-    
+
     declare_map_cmd = DeclareLaunchArgument(
             'map', default_value=os.path.join(
                 get_package_share_directory('neo_mp_500-2'),
@@ -153,18 +153,18 @@ def generate_launch_description():
                 'neo_workshop.yaml'),
             description='Full path to map file to load'
         )
-    
+
     declare_nav2_param_file_cmd = DeclareLaunchArgument(
             'nav2_params_file', default_value="",
             description='Full path to the Nav2 parameters file to load.\n'
                         '\tLeave empty to use the default file based on the robot type'
         )
-    
+
     declare_use_rviz_cmd = DeclareLaunchArgument(
             'use_rviz', default_value='True',
             description='Launch RViz for visualization'
         )
-    
+
     # Adding all the necessary launch description actions
     launch_desc.add_action(declare_use_sim_time_cmd)
     launch_desc.add_action(declare_autostart_cmd)
