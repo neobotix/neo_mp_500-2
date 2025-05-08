@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+Author: Pradheep Padmanabhan
+Contributor: Adarsh Karan K P
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mp_500">
+
+  <!-- Import wheel macros -->
+  <xacro:include filename="$(find neo_mp_500-2)/robot_model/xacros/mp_500_wheel_macro.xacro"/>
+  <xacro:include filename="$(find neo_mp_500-2)/robot_model/xacros/mp_500_caster_wheel_macro.xacro"/>
+
+  <xacro:macro name="mp_500_body">
+      
+    <link name="base_link"/>
+    
+    <link name="base_footprint">
+      <inertial>
+        <mass value="30"/>
+        <origin xyz="0 0 0"/>
+        <inertia 
+          ixx="1.71402" 
+          ixy="0.0" 
+          ixz="0.0" 
+          iyy="0.8856" 
+          iyz="0.0" 
+          izz="2.5725"
+          />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 1.570796" xyz="0.0 0.0 0"/>
+        <geometry>
+          <mesh filename="package://neo_mp_500-2/robot_model/meshes/MP-500-BODY.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin rpy=" 0 0. 1.570796" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://neo_mp_500-2/robot_model/meshes/MP-500-BODY.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="base_footprint_joint" type="fixed">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 -1"/>
+    <limit effort="1000.0" lower="-1e+16" upper="1e+16" velocity="20"/>
+    <dynamics damping="1" friction="1"/>
+      <parent link="base_link"/>
+      <child link="base_footprint"/>
+    </joint>
+
+    <!-- Caster Wheel-->
+    <xacro:mp_500_caster_wheel
+      wheel_prefix="mp_500_caster_wheel"
+      parent_link="base_footprint" 
+      wheel_joint_type="fixed"
+      >
+      <origin rpy="-1.570796 0 1.570796 " xyz="-0.43 0. 0.176"/>
+    </xacro:mp_500_caster_wheel>
+
+    <!-- Wheels-->
+    <xacro:mp_500_wheel
+      wheel_prefix="mp_500_wheel_right"
+      parent_link="base_link" 
+      wheel_joint_type="revolute"
+      visual_origin_rpy="0 0 3.14"
+      >
+      <origin rpy="0 0 -1.570796" xyz="0 -${wheel_separation/2} 0.13"/>
+    </xacro:mp_500_wheel>
+
+    <xacro:mp_500_wheel
+      wheel_prefix="mp_500_wheel_left"
+      parent_link="base_link" 
+      wheel_joint_type="revolute"
+      visual_origin_rpy="0 0 0"
+      >
+      <origin rpy="0 0 -1.570796" xyz="0 ${wheel_separation/2} 0.13"/>
+    </xacro:mp_500_wheel>
+
+  </xacro:macro>
+
+</robot>
