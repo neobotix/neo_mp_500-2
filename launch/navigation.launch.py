@@ -23,7 +23,7 @@ def execution_stage(
         use_sim_time,
         autostart, namespace, use_multi_robots,
         head_robot, use_amcl, map_dir, param_dir, use_rviz):
-    
+
     launch_actions = []
 
     params = str(param_dir.perform(context))
@@ -34,10 +34,10 @@ def execution_stage(
                 get_package_share_directory('neo_mp_500-2'),
                 'configs', 'navigation',
                 'navigation.yaml')
-        
+
     nav2_launch_file_dir = os.path.join(get_package_share_directory('neo_nav2_bringup'), 'launch')
 
-    # Start navigation and push namespace if and only if the multi robot scenario is set to true. 
+    # Start navigation and push namespace if and only if the multi robot scenario is set to true.
     start_navigation = GroupAction([
         PushRosNamespace(
             condition=IfCondition(use_multi_robots),
