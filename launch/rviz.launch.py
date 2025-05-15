@@ -110,8 +110,8 @@ def generate_launch_description():
     declare_rviz_cfg_arg = DeclareLaunchArgument(
             'rviz_config',
             default_value=os.path.join(
-            get_package_share_directory('mp_rviz'),
-            'rviz', 'robot_description_rviz.rviz'),
+            get_package_share_directory('neo_mp_500-2'),
+            'configs', 'rviz', 'robot_description_rviz.rviz'),
             description='Full path to an RViz config file'
         )
 
