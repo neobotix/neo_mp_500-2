@@ -132,6 +132,16 @@ def execution_stage(context: LaunchContext,
 
     launch_actions.append(imu)
 
+    relay_topic_joint_states = Node(
+        package='topic_tools',
+        executable='relay',
+        name='relay_joint_states',
+        output='screen',
+        parameters=[{'input_topic': "drives/joint_states",'output_topic': "joint_states"}]
+    )
+
+    launch_actions.append(relay_topic_joint_states)
+
     return launch_actions
 
 def generate_launch_description():
