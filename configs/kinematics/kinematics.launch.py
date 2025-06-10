@@ -8,6 +8,10 @@ import launch_ros.actions
 def generate_launch_description():
     config = os.path.join(get_package_share_directory('neo_mp_500-2'),'configs/kinematics','kinematics.yaml')
     return launch.LaunchDescription([
-        launch_ros.actions.Node(package='neo_kinematics_differential2', executable='neo_differential_node', output='screen',
-            name='neo_differential_node', parameters = [config])
+        launch_ros.actions.Node(
+            package='neo_kinematics_differential2',
+            executable='neo_differential_node',
+            output='screen',
+            name='neo_differential_node',
+            parameters = [config])
     ])
