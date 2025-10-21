@@ -51,7 +51,7 @@ Contributor: Adarsh Karan K P
 
     <!-- Caster Wheel-->
     <xacro:mp_500_caster_wheel
-      wheel_prefix="caster_wheel"
+      wheel_prefix="mp_500_caster_wheel"
       parent_link="base_footprint" 
       wheel_joint_type="fixed"
       >
@@ -60,7 +60,7 @@ Contributor: Adarsh Karan K P
 
     <!-- Wheels-->
     <xacro:mp_500_wheel
-      wheel_prefix="wheel_right"
+      wheel_prefix="mp_500_wheel_right"
       parent_link="base_link" 
       wheel_joint_type="revolute"
       visual_origin_rpy="0 0 3.14"
@@ -69,7 +69,7 @@ Contributor: Adarsh Karan K P
     </xacro:mp_500_wheel>
 
     <xacro:mp_500_wheel
-      wheel_prefix="wheel_left"
+      wheel_prefix="mp_500_wheel_left"
       parent_link="base_link" 
       wheel_joint_type="revolute"
       visual_origin_rpy="0 0 0"
